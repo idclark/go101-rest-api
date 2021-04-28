@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"rest-api/internal/comment"
 	"rest-api/internal/database"
 	transport "rest-api/internal/transport/http"
 )
@@ -14,12 +15,14 @@ func (app *App) Run() error {
 	fmt.Println("Setting up my app")
 
 	var err error
-	_, err = database.NewDatabase()
+	db, err := database.NewDatabase()
 	if err != nil {
 		return err
 	}
 
-	handler := transport.NewHandler()
+	commentService := comment.NewService(db)
+
+	handler := transport.NewHandler(commentService)
 	handler.SetupRoutes()
 
 	if err := http.ListenAndServe(":8080", handler.Router); err != nil {
