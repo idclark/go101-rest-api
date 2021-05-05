@@ -20,6 +20,12 @@ func (app *App) Run() error {
 		return err
 	}
 
+	err = database.MigrateDB(db)
+
+	if err != nil {
+		return err
+	}
+
 	commentService := comment.NewService(db)
 
 	handler := transport.NewHandler(commentService)
