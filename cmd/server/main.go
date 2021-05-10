@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"rest-api/internal/comment"
@@ -53,7 +52,8 @@ func (app *App) Run() error {
 }
 
 func main() {
-	fmt.Println("Go Rest API!")
+	log.Info("Starting Rest API!")
+
 	app := App{
 		Name:    "Comment Service",
 		Version: "1.0.0",
