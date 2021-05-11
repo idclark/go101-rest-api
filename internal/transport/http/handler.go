@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 type Handler struct {
@@ -20,6 +21,18 @@ type Response struct {
 	Error   string
 }
 
+func LoggingMiddleWare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.WithFields(
+			log.Fields{
+				"Method": r.Method,
+				"Path":   r.URL.Path,
+			}).
+			Info("handled request")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func NewHandler(service *comment.Service) *Handler {
 	return &Handler{
 		Service: service,
@@ -29,6 +42,7 @@ func NewHandler(service *comment.Service) *Handler {
 func (h *Handler) SetupRoutes() {
 	fmt.Println("Setting up Routes")
 	h.Router = mux.NewRouter()
+	h.Router.Use(LoggingMiddleWare)
 	h.Router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
